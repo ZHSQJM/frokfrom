@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="pageNav(pageInfo)">
+        <ul  class="pagination">
+            
+            <li th:if="${pageInfo.hasPreviousPage}">
+                <a th:href="@{'?page='+${pageInfo.prePage}}" >
+                    上一页
+                </a>
+            </li>
+            <th:block th:each="nav : ${pageInfo.navigatepageNums}">
+                <li  th:class="${nav==pageInfo.pageNum}?'active':''"> <a th:href="@{'?page='+${nav}}" th:text="${nav}"></a>
+                </li>
+            </th:block>
+            <th:block th:if="${pageInfo.hasNextPage}">
+                <li >
+                    <a th:href="@{'?page='+${pageInfo.nextPage}}" >
+                        下一页
+                    </a>
+                </li>
+            </th:block>
+          <li>
+              <a >  当前是第<span th:text="${pageInfo.pageNum }"></span>页，总共<span th:text="${pageInfo.pages }"></span>页，总共<span th:text="${pageInfo.total }"></span>条记录</a>
+          </li>
+        </ul>
+    </div>
+</body>
+</html>

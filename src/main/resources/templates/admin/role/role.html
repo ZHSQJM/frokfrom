@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+<title>角色列表</title>
+  <header th:replace="common/resource::html"></header>
+  <link href="http://example.itshubao.com/demo/css/materialdesignicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="http://libs.itshubao.com/zTree_v3/css/materialDesignStyle/materialdesign.css" type="text/css">
+</head>
+
+<body>
+<div class="lyear-layout-web">
+  <div class="lyear-layout-container">
+    <!--左侧导航-->
+    <aside th:replace="common/menu::menu"></aside>
+    <!--End 左侧导航-->
+    
+    <!--头部信息-->
+    <aside th:replace="common/header::header"></aside>
+    <!--End 头部信息-->
+    
+    <!--页面主要内容-->
+    <main class="lyear-layout-content">
+      
+      <div class="container-fluid">
+        
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="card">
+              <div class="card-toolbar clearfix">
+                <div class="toolbar-btn-action">
+                  <a class="btn btn-primary m-r-5" sec:authorize="hasAnyAuthority('role:add')" href="#!"><i class="mdi mdi-plus"></i> 新增</a>
+                  <a class="btn btn-danger" sec:authorize="hasAnyAuthority('role:delete')" href="#!"><i class="mdi mdi-window-close"></i> 删除</a>
+                </div>
+              </div>
+              <div class="card-body">
+                
+                <div class="table-responsive">
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>
+                          <label class="lyear-checkbox checkbox-primary">
+                            <input type="checkbox" id="check-all"><span></span>
+                          </label>
+                        </th>
+                        <th width="4%">序号</th>
+                        <th>角色名称</th>
+                        <th>角色描述</th>
+                        <th>角色码</th>
+                        <th>创建时间</th>
+                        <th>更新时间</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr th:each="data : ${data.list}">
+                        <td>
+                          <label class="lyear-checkbox checkbox-primary">
+                            <input type="checkbox" name="ids[]" value="1"><span></span>
+                          </label>
+                        </td>
+                        <td th:text="${dataStat.index+1}"></td>
+                        <td th:text="${data.roleName}">脾气很好的钢铁侠</td>
+                        <td th:text="${data.description}">123456</td>
+                        <td th:text="${data.roleCode}">19952412984</td>
+                        <td th:text="${#dates.format(data.createTime,'yyyy-MM-dd HH:mm:ss')}">2534798858@qq.com</td>
+                        <td th:text="${#dates.format(data.updateTime,'yyyy-MM-dd HH:mm:ss')}">2534798858@qq.com</td>
+                        <td>
+                          <div class="btn-group">
+                            <a class="btn btn-xs btn-warning" sec:authorize="hasAnyAuthority('role:allocation')" href="#modal-form-update"th:onclick="allocation([[${data.roleId}]])" data-toggle="modal" title="分配权限"> <i class="mdi mdi-plus"></i></a>
+                            <a class="btn btn-xs btn-primary"sec:authorize="hasAnyAuthority('role:update')" href="#!" title="编辑" data-toggle="tooltip"><i class="mdi mdi-pencil"></i></a>
+                            <a class="btn btn-xs btn-danger" sec:authorize="hasAnyAuthority('role:delete')" href="#!" title="删除" data-toggle="tooltip"><i class="mdi mdi-delete"></i></a>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div th:replace="common/page :: pageNav(${data})"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="modal-form-update" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="exampleModalLabel">分配权限</h4>
+            </div>
+            <div class="modal-body">
+              <form class="form-horizontal" id="add-role" action="lyear_forms_elements.html" method="post" onsubmit="return false;">
+                <ul id="treeDemo" class="ztree"></ul>
+                <input type="hidden" id="roleIds" name="roleIds">
+                <input type="hidden" id="role" name="roleId">
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default disclose" data-dismiss="modal">取消</button>
+              <button type="button" onclick="submitRole()" class="btn btn-primary">提交</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!--End 页面主要内容-->
+  </div>
+</div>
+<script type="text/javascript" src="http://libs.itshubao.com/zTree_v3/js/jquery.ztree.all.min.js"></script>
+<script th:src="@{/js/jquery.form.js}"></script>
+<script type="text/javascript">
+    var zTree;
+    var zNodes = [];
+    var setting = {
+        view: {
+            addHoverDom: false,
+            removeHoverDom: false,
+            selectedMulti: false
+        },
+        check : {
+            chkboxType:{"Y":"ps","N":"ps"},//勾选checkbox对于父子节点的关联关系
+            chkStyle:"checkbox",
+            enable : true   //是否复选框
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+
+    };
+    function allocation (id) {
+        document.getElementById("role").value=id;
+        http("/menu/getPermission/"+id,"get",null,function (rt) {
+            console.log(rt.data);
+            zNodes = rt.data;
+            zTree = $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+        },false)
+    }
+    function submitRole(){
+        //获取选中的节点，传到后台
+        var nodes = zTree.getCheckedNodes();
+        var ids = [];
+        for(var i=0,l=nodes.length;i<l;i++){
+            ids[ids.length] = nodes[i].id;
+        }
+       document.getElementById("roleIds").value=ids.join(",");
+        httpForm("#add-role","post","role/allocation",$('#add-role').serialize(),function (rt) {
+            //关闭弹窗
+             $(".disclose").click();
+        })
+    }
+</script>
+</body>
+</html>

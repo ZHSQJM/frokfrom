@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhs.mapper.WxSignRecordsMapper" >
+  <resultMap id="BaseResultMap" type="com.zhs.entity.WxSignRecords" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="date" property="date" jdbcType="TIMESTAMP" />
+    <result column="date_time" property="dateTime" jdbcType="VARCHAR" />
+    <result column="openid" property="openid" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <resultMap id="BaseResultMapVo" type="com.zhs.vo.SignRecordsVo" >
+    <result column="date_time" property="dateTime" jdbcType="TIMESTAMP" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+    <result column="integral" property="integral" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <select id="list" resultMap="BaseResultMapVo">
+   SELECT
+	a.nick_name,
+	a.integral,
+	b.date_time
+FROM
+	wx_user AS a
+	INNER JOIN wx_sign_records AS b ON a.open_id = b.openid
+ORDER BY
+	b.date_time DESC
+
+  </select>
+</mapper>

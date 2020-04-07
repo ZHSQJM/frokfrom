@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhs.mapper.BlogMapper">
+  <resultMap id="BaseResultMap" type="com.zhs.entity.Blog">
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <result column="id" jdbcType="VARCHAR" property="id" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="category_id" jdbcType="VARCHAR" property="categoryId" />
+    <result column="flag" jdbcType="INTEGER" property="flag" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="synopsis" jdbcType="VARCHAR" property="synopsis" />
+    <result column="look" jdbcType="INTEGER" property="look" />
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+  </resultMap>
+</mapper>

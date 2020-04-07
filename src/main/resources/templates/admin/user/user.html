@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+<title>用户列表</title>
+  <header th:replace="common/resource::html"></header>
+</head>
+
+<body>
+<div class="lyear-layout-web">
+  <div class="lyear-layout-container">
+    <!--左侧导航-->
+    <aside th:replace="common/menu::menu"></aside>
+    <!--End 左侧导航-->
+    
+    <!--头部信息-->
+    <aside th:replace="common/header::header"></aside>
+    <!--End 头部信息-->
+    
+    <!--页面主要内容-->
+    <main class="lyear-layout-content">
+      
+      <div class="container-fluid">
+        
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="card">
+              <div class="card-toolbar clearfix">
+                <form class="pull-right search-bar" method="get" action="#!" role="form">
+                  <div class="input-group">
+                    <input type="text" class="form-control" value="" name="keyword" placeholder="请输入名称">
+                  </div>
+                </form>
+                <div class="toolbar-btn-action">
+                  <a class="btn btn-primary m-r-5" sec:authorize="hasAnyAuthority('user:add')" href="#!"><i class="mdi mdi-plus"></i> 新增</a>
+                  <a class="btn btn-danger" sec:authorize="hasAnyAuthority('user:delete')" href="#!"><i class="mdi mdi-window-close"></i> 删除</a>
+                </div>
+              </div>
+              <div class="card-body">
+                
+                <div class="table-responsive">
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>
+                          <label class="lyear-checkbox checkbox-primary">
+                            <input type="checkbox" id="check-all"><span></span>
+                          </label>
+                        </th>
+                        <th width="4%">序号</th>
+                        <th>用户名</th>
+                        <th>密码</th>
+                        <th>手机号码</th>
+                        <th>头像</th>
+                        <th>性别</th>
+                        <th>email</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr th:each="data : ${data.list}">
+                        <td>
+                          <label class="lyear-checkbox checkbox-primary">
+                            <input type="checkbox" name="ids[]" value="1"><span></span>
+                          </label>
+                        </td>
+                        <td th:text="${dataStat.index+1}"></td>
+                        <td th:text="${data.username}">脾气很好的钢铁侠</td>
+                        <td th:text="${data.password}">123456</td>
+                        <td th:text="${data.telephone}">19952412984</td>
+                        <td th:text="${data.avatar}">《倚天屠龙记》</td>
+                        <td th:text="${data.sex=='1'?'男':'女'}"></td>
+                        <td th:text="${data.email}">2534798858@qq.com</td>
+                        <td>
+                          <div class="btn-group">
+                            <a class="btn btn-xs btn-warning" sec:authorize="hasAnyAuthority('user:allocation')" data-toggle="modal" title="分配角色"> <i class="mdi mdi-plus"></i></a>
+                            <a class="btn btn-xs btn-primary" sec:authorize="hasAnyAuthority('user:update')" href="#!" title="编辑" data-toggle="tooltip"><i class="mdi mdi-pencil"></i></a>
+                            <a class="btn btn-xs btn-danger" sec:authorize="hasAnyAuthority('user:delete')"	 th:onclick="deleteUser([[${data.id}]])"title="删除" data-toggle="tooltip"><i class="mdi mdi-delete"></i></a>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div th:replace="common/page :: pageNav(${data})"></div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        
+      </div>
+      
+    </main>
+    <!--End 页面主要内容-->
+  </div>
+</div>
+<script type="text/javascript">
+  function deleteUser(id){
+      confirm("/menu/"+id,function ok(res) {
+          console.log(res)
+          $(".disclose").click();
+          window.location.reload();
+      })
+  }
+</script>
+</body>
+</html>

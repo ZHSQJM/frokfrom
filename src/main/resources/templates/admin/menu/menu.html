@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>菜单管理</title>
+    <header th:replace="common/resource::html"></header>
+    <link href="/js/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <div class="lyear-layout-web">
+      <div class="lyear-layout-container">
+        <!--左侧导航-->
+        <aside th:replace="common/menu::menu"></aside>
+        <!--End 左侧导航-->
+
+        <!--头部信息-->
+        <aside th:replace="common/header::header"></aside>
+        <!--End 头部信息-->
+
+        <!--页面主要内容-->
+        <main class="lyear-layout-content">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-lg-12">
+                <div class="card">
+                  <div class="card-body">
+                    <div id="toolbar2" class="toolbar-btn-action">
+                      <button type="button" class="btn btn-primary m-r-5" href="#modal-form-update" data-toggle="modal"><i class="mdi mdi-plus"></i>新增</button>
+                      <button type="button" class="btn btn-danger m-r-5" onclick="test()">删除</button>
+                    </div>
+                    <table class="tree-table"></table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <div class="modal fade" id="modal-form-update" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" >
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">新增</h4>
+              </div>
+              <div class="modal-body">
+                <form class="form-horizontal" id="add-menu" action="lyear_forms_elements.html" method="post" onsubmit="return false;">
+                  <div class="form-group"  id="divpid">
+                    <label class="col-md-3 control-label" for="pid">上级菜单</label>
+                    <div class="col-md-7">
+                      <select class="form-control" id="pid" name="pid" size="1">
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-md-3 control-label" for="resource-name">菜单名称</label>
+                    <div class="col-md-7">
+                      <input class="form-control" type="text" id="resource-name" name="name" placeholder="请输入资源名称..">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-md-3 control-label" for="url">地址</label>
+                    <div class="col-md-7">
+                      <input class="form-control" type="text" id="url" name="url" placeholder="地址">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-md-3 control-label" for="code">权限吗</label>
+                    <div class="col-md-7">
+                      <input class="form-control" type="text" id="code" name="code" placeholder="权限码">
+                      <input type="hidden" name="icon" id="icon">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-md-3 control-label" for="icon">图标</label>
+                    <div class="col-md-7">
+                      <input type="text" id="icon-example" />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-md-3 control-label" for="type">类型</label>
+                    <div class="col-md-7">
+                      <select class="form-control" id="type" name="type" size="1">
+                        <option value="0">菜单</option>
+                        <option value="1">按钮</option>
+                        <option value="2">接口</option>
+                      </select>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default disclose" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary add-menu">提交</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+<script type="text/javascript" src="/js/bootstrap-table/bootstrap-table.js"></script>
+<script type="text/javascript" src="/js/bootstrap-table/bootstrap-table-zh-CN.min.js"></script>
+
+<!--以下是tree-grid的使用示例-->
+<link href="/js/jquery-treegrid/jquery.treegrid.min.css" rel="stylesheet">
+<script type="text/javascript" src="/js/jquery-treegrid/jquery.treegrid.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap-table/extensions/treegrid/bootstrap-table-treegrid.min.js"></script>
+<script type="text/javascript" src="http://libs.itshubao.com/fontIconPicker/jquery.fonticonpicker.min.js"></script>
+<script th:src="@{/js/jquery.form.js}"></script>
+<script>
+  jQuery(document).ready(function($) {
+      var font_element = $('#icon-example').fontIconPicker({
+          theme: 'fip-bootstrap'
+      });
+      $.ajax({
+          url: '../../../materialdesignicons.json',
+          type: 'GET',
+      }).done(function(response) {
+          var fontello_json_icons = [];
+          $.each(response.glyphs, function(i, v) {
+              fontello_json_icons.push( v.css );
+          });
+          font_element.setIcons(fontello_json_icons);
+      }).fail(function() {
+          console.error('字体图标配置加载失败');
+      });
+
+  });
+  $(".add-menu").click(function(){
+      $("#icon").val($("#icon-example").val());
+      httpForm("#add-menu","post","menu",$('#add-menu').serialize(),function (rt) {
+          window.location.reload();
+          $(':input','#add-menu')
+              .not(':button, :submit, :reset, :hidden')
+              .val('')
+              .removeAttr('checked')
+              .removeAttr('selected');
+          $(".disclose").click();
+      })
+  });
+</script>
+<script type="text/javascript">
+  http("/menu/all","get",null,function (rt) {
+      data = rt.data;
+      var $treeTable = $('.tree-table');
+      $treeTable.bootstrapTable({
+          data: data,
+          idField: 'id',
+          uniqueId: 'id',
+          dataType: 'json',
+          toolbar: '#toolbar2',
+          columns: [
+              {
+                  field: 'check',
+                  checkbox: true
+              },
+              { field: 'name',  title: '名称' },
+              { field: 'type',  title: '类型',   align: 'center', formatter: 'typeFormatter'  },
+              { field: 'permissionValue', title: '权限值'  },
+              { field: 'href', title: '地址'  },
+              { field: 'icon', title: '图标'  ,  align: 'center', formatter: 'iconFormatter' },
+              {field: 'permissionValue', title: '权限值'},
+              {
+                  field: 'operate',
+                  title: '操作',
+                  align: 'center',
+                  events : {
+                      'click .role-add': function (e, value, row, index) {
+                          add(row.id);
+                      },
+                      'click .role-delete': function (e, value, row, index) {
+                          del(row.id);
+                      },
+                      'click .role-edit': function (e, value, row, index) {
+                          update(row.id);
+                      }
+                  },
+                  formatter: operateFormatter
+              }
+          ],
+
+          treeShowField: 'name',
+          parentIdField: 'pid',
+
+          onResetView: function(data) {
+              $treeTable.treegrid({
+                  initialState: 'collapsed', // 所有节点都折叠
+                  treeColumn: 1,
+                  //expanderExpandedClass: 'mdi mdi-folder-open',  // 可自定义图标样式
+                  //expanderCollapsedClass: 'mdi mdi-folder',
+                  onChange: function() {
+                      $treeTable.bootstrapTable('resetWidth');
+                  }
+              });
+
+              // 只展开树形的第一集节点
+             // $treeTable.treegrid('getRootNodes').treegrid('expand');
+          },
+          onCheck: function(row) {
+              var datas = $treeTable.bootstrapTable('getData');
+              selectChilds(datas, row, 'id', 'pid', true); // 选择子类
+              selectParentChecked(datas, row, 'id', 'pid'); // 选择父类
+              $treeTable.bootstrapTable('load', datas);
+          },
+
+          onUncheck: function(row) {
+              var datas = $treeTable.bootstrapTable('getData');
+              selectChilds(datas, row, 'id', 'pid', false);
+              $treeTable.bootstrapTable('load', datas);
+          },
+      });
+
+  },false)
+  // 操作按钮
+  function operateFormatter(value, row, index) {
+      return [
+          '<a type="button" class="role-add btn btn-xs btn-dark m-r-5" sec:authorize="hasAnyAuthority(\'menu:add\')"  title="新增" data-toggle="tooltip"><i class="mdi mdi-plus"></i></a>',
+          '<a type="button" class="role-edit btn btn-xs btn-primary m-r-5"  sec:authorize="hasAnyAuthority(\'menu:update\')" title="修改" data-toggle="tooltip"><i class="mdi mdi-pencil"></i></a>',
+          '<a type="button" class="role-delete btn btn-xs btn-danger" sec:authorize="hasAnyAuthority(\'menu:delete\')"  title="删除" data-toggle="tooltip"><i class="mdi mdi-delete"></i></a>'
+      ].join('');
+  }
+  function typeFormatter(value, row, index) {
+      if (value === 0) { return '<button type="button" class="btn btn-cyan btn-sm " style="margin-right:15px;">菜单</button>' }
+      if (value === 1) { return '<button type="button" class="btn btn-yellow btn-sm " style="margin-right:15px;">按钮</button>' }
+      if (value === 2) { return '<button type="button" class="btn btn-pink btn-sm " style="margin-right:15px;">接口</button>'}
+      return '-';
+  }
+  function iconFormatter(value, row, index) {
+      return '<i class="'+value+'"><i>'
+  }
+  /**
+   * 选中父项时，同时选中子项
+   * @param datas 所有的数据
+   * @param row 当前数据
+   * @param id id 字段名
+   * @param pid 父id字段名
+   */
+  function selectChilds(datas,row,id,pid,checked) {
+      for(var i in datas){
+          if(datas[i][pid] == row[id]){
+              datas[i].check=checked;
+              selectChilds(datas,datas[i],id,pid,checked);
+          };
+      }
+  }
+
+  function selectParentChecked(datas,row,id,pid){
+      for(var i in datas){
+          if(datas[i][id] == row[pid]){
+              datas[i].check=true;
+              selectParentChecked(datas,datas[i],id,pid);
+          };
+      }
+  }
+
+  function add(id) {
+      http("/menu/"+id,"get",null,function (rt) {
+          var data = rt.data;
+          $("#pid").empty();
+          $("#pid").append("<option value='"+data.id+"'>"+data.name+"</option>");
+          $("#divpid").display='none'
+          $("#modal-form-update").modal();
+      },false)
+
+  }
+  function del(id) {
+      confirm("/menu/"+id,function ok(res) {
+          console.log(res)
+      })
+  }
+  function update(id) {
+      alert("update 方法 , id = " + id);
+  }
+  function test() {
+      var selRows = $treeTable.bootstrapTable("getSelections");
+      if(selRows.length == 0){
+          alert("请至少选择一行");
+          return;
+      }
+      console.log(selRows);
+
+      var postData = "";
+      $.each(selRows,function(i) {
+          postData +=  this.id;
+          if (i < selRows.length - 1) {
+              postData += "， ";
+          }
+      });
+      alert("你选中行的 id 为："+postData);
+  }
+</script>
+  </body>
+</html>

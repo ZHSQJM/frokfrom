@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhs.mapper.WxUserMapper" >
+  <resultMap id="BaseResultMap" type="com.zhs.entity.WxUser" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <result column="open_id" property="openId" jdbcType="VARCHAR" />
+    <result column="avatar_url" property="avatarUrl" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="gender" property="gender" jdbcType="INTEGER" />
+    <result column="integral" property="integral" jdbcType="INTEGER" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+    <result column="province" property="province" jdbcType="VARCHAR" />
+    <result column="recently_time" property="recentlyTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <select id="list" resultMap="BaseResultMap">
+    SELECT * FROM wx_user where 1=1
+     <if test="nickName!=null and nickName!=''">
+        and nick_name like  concat('%',#{nickName},'%')
+     </if>
+    <if test="gender!=null">
+      and gender = #{gender}
+    </if>
+     ORDER  BY create_time desc
+  </select>
+
+  <select id="getTodaySum">
+
+    SELECT count(*)  FROM wx_user WHERE create_time BETWEEN
+    ( SELECT CONCAT((SELECT CURDATE() as time),' 00:00:00'))
+    and
+    ( SELECT CONCAT((SELECT CURDATE() as time),' 23:59:59'))
+
+  </select>
+</mapper>

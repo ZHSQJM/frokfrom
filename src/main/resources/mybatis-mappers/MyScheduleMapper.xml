@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhs.mapper.MyScheduleMapper" >
+  <resultMap id="BaseResultMap" type="com.zhs.entity.MySchedule" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="VARCHAR" />
+    <result column="end_time" property="endTime" jdbcType="VARCHAR" />
+    <result column="createTime" property="createtime" jdbcType="TIMESTAMP" />
+    <result column="updateTime" property="updatetime" jdbcType="TIMESTAMP" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="color" property="color" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <resultMap id="BaseResultMapVo" type="com.zhs.vo.ScheduleVo" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="start_time" property="start" jdbcType="VARCHAR" />
+    <result column="end_time" property="end" jdbcType="VARCHAR" />
+    <result column="content" property="remark" jdbcType="VARCHAR" />
+    <result column="color" property="className" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <select id="list" resultMap="BaseResultMapVo">
+          select  * from  my_schedule
+
+  </select>
+</mapper>

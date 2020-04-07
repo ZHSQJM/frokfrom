@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!--左侧导航-->
+<aside class="lyear-layout-sidebar" th:fragment="menu">
+
+    <!-- logo -->
+    <div id="logo" class="sidebar-header">
+        <a href="/index"><img src="../../images/logo-sidebar.png" title="LightYear" alt="LightYear" /></a>
+    </div>
+    <div class="lyear-layout-sidebar-scroll">
+
+        <nav class="sidebar-main">
+            <ul class="nav nav-drawer"  >
+                <li th:each="menu : ${session.menu}" class="nav-item nav-item-has-subnav">
+                    <a th:if="${#lists.isEmpty(menu.list)}"  class="zhs-url"  th:href="@{${menu.url}}" >
+                        <i  th:if="${#lists.isEmpty(menu.list)}"   th:class="${menu.icon}" ></i><span th:text="${menu.name}" ></span>
+                    </a>
+                    <a th:if="!${#lists.isEmpty(menu.list)}" href="javascript:void(0)">
+                        <i th:class="${menu.icon}"></i><span th:text="${menu.name}" ></span> </a>
+                    <ul class="nav nav-subnav">
+                        <li th:each="cmenu : ${menu.list}">
+                            <a th:if="${#lists.isEmpty(cmenu.list)}"  th:utext="${cmenu.name}"  th:class="zhs-url"  th:href="@{${cmenu.url}}">二级菜单</a>
+                        </li>
+                    </ul>
+
+                </li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <p class="copyright">Copyright &copy; 2019. <a target="_blank" href="http://www.zhouhuasheng.com">脾气很好的钢铁侠</a> All rights reserved.</p>
+        </div>
+    </div>
+</aside>
+
+<!--End 左侧导航-->
+<script>
+
+
+
+</script>
+
+</body>
+</html>

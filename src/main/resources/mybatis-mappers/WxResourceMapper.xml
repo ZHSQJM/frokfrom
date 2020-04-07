@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhs.mapper.WxResourceMapper" >
+  <resultMap id="BaseResultMap" type="com.zhs.vo.ResourceVo" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <result column="id" property="id" jdbcType="BIGINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="nickName" property="nick_name" jdbcType="VARCHAR" />
+    <result column="photh_url" property="photoUrl" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="type_name" property="typeName" jdbcType="VARCHAR" />
+    <result column="integral" property="integral" jdbcType="INTEGER" />
+    <result column="type_id" property="typeId" jdbcType="VARCHAR" />
+    <result column="records" property="records" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+
+  </resultMap>
+
+
+
+
+  <select id="list" resultMap="BaseResultMap" >
+  SELECT
+	a.id,
+	a.`name`,
+	b.nick_name,
+	a.photh_url,
+	a.records,
+	a.`status`,
+		a.integral,
+	a.create_time,
+	a.update_time,
+	a.url,
+	a.`password`,
+	c.`name` AS type_name,
+	c.id AS type_id
+FROM
+	wx_resource AS a
+	INNER JOIN wx_user AS b ON a.open_id = b.open_id
+	INNER JOIN wx_category AS c ON a.category_type = c.id
+WHERE 1=1
+  <if test="name!=null and name!=''">
+    and a.`name` like  concat('%',#{name},'%')
+  </if>
+ <if test="nickName!=null and nickName!=''">
+   AND b.nick_name LIKE concat('%',#{nickName},'%')
+ </if>
+	<if test="typeId!=null and typeId!=''">
+      AND c.id = #{typeId}
+    </if>
+    <if test="status!=null and status!=''">
+      AND a.status = #{status}
+    </if>
+       order by  a.create_time desc
+  </select>
+
+    <update id="updateStatus">
+        UPDATE wx_resource set `status` = #{status} where id =#{id}
+    </update>
+</mapper>

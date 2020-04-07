@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <title>资源列表</title>
+  <header th:replace="common/resource::html"></header>
+  <link href="/js/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="http://libs.itshubao.com/dropzone/min/basic.min.css" />
+  <link rel="stylesheet" href="http://libs.itshubao.com/dropzone/min/dropzone.min.css" />
+  <style>
+    /**字符串过长 转化为 。。。**/
+    table{
+      width:100px;
+      table-layout:fixed;/* 只有定义了表格的布局算法为fixed，下面td的定义才能起作用。 */
+    }
+    td{
+      width:100%;
+      word-break:keep-all;/* 不换行 */
+      white-space:nowrap;/* 不换行 */
+      overflow:hidden;/* 内容超出宽度时隐藏超出部分的内容 */
+      text-overflow:ellipsis;/* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用*/
+      -o-text-overflow:ellipsis;
+      -icab-text-overflow: ellipsis;
+      -khtml-text-overflow: ellipsis;
+      -moz-text-overflow: ellipsis;
+      -webkit-text-overflow: ellipsis;
+    }
+    #previews .file-row.dz-success .progress {
+      opacity: 0;
+      transition: opacity 0.3s linear;
+    }
+    #previews .file-row .delete {
+      display: none;
+    }
+    #previews .file-row.dz-success .start,
+    #previews .file-row.dz-success .cancel {
+      display: none;
+    }
+    #previews .file-row.dz-success .delete {
+      display: block;
+    }
+    .dropzone-preview {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #fafafa;
+    }
+    .dropzone-preview img {
+      max-width: 100%;
+      max-height: 110px;
+    }
+    .dropzone-message .dropzone-name {
+      margin-top: 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    #previews li {
+      margin-bottom: 10px;
+    }
+    @media screen and (max-width: 420px) {
+      #example-uploads .btn span {
+        display: none;
+      }
+    }
+    @media screen and (max-width: 380px) {
+      .dropzone-btns .btn span {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="lyear-layout-web">
+  <div class="lyear-layout-container">
+    <!--左侧导航-->
+    <aside th:replace="common/menu::menu"></aside>
+    <!--End 左侧导航-->
+
+    <!--头部信息-->
+    <aside th:replace="common/header::header"></aside>
+    <!--End 头部信息-->
+
+    <!--页面主要内容-->
+    <main class="lyear-layout-content">
+
+      <div class="container-fluid">
+
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-toolbar clearfix">
+
+        </div>
+        <div class="card-body">
+
+          <div id="toolbar" class="toolbar-btn-action">
+            <form class="form-inline">
+              <div class="form-group">
+                <div class="input-group">
+                  <input type="text" class="form-control" id="name" name="name" placeholder="请输入资源名称" th:value="${resourceQuery.name}">
+                </div>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" id="nickName" name="nickName" placeholder="请输入上传者" th:value="${resourceQuery.nickName}">
+              </div>
+              <div class="form-group">
+                <label for="status">分类</label>
+                <select class="form-control" id="status" name="status" size="1" >
+                  <option value="" th:selected="''==${resourceQuery.status}">全部</option>
+                  <option value=1 th:selected="1==${resourceQuery.status}" >审核中</option>
+                  <option value=2 th:selected="2==${resourceQuery.status}">通过</option>
+                  <option value=3 th:selected="3==${resourceQuery.status}">未通过</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <div id="toolbar2" class="toolbar-btn-action">
+                  <button type="submit" class="btn btn-primary m-r-5" onclick="search()">查询</button>
+                  <button type="button" class="btn btn-success m-r-5" href="#modal-form-update" data-toggle="modal"></i>新增</button>
+                  <button type="button" class="btn btn-danger m-r-5" onclick="test()">删除</button>
+                </div>
+              </div>
+
+            </form>
+
+          </div>
+          <table id="tb_departments"></table>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="modal fade" id="modal-form-update" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="exampleModalLabel">新增</h4>
+            </div>
+            <div class="modal-body">
+              <form class="form-horizontal" id="add-resource" action="lyear_forms_elements.html" method="post" onsubmit="return false;">
+                <div class="form-group">
+                  <label class="col-md-3 control-label" for="categoryType">类型</label>
+                  <div class="col-md-7">
+                    <select th:field="${categorys}" id="categoryType"  class="form-control"  name="categoryType">
+                      <option th:each="category : ${categorys}"
+                              th:value="${category.id}" th:text="${category.name}">Credit card</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label" for="resource-name">资源名称</label>
+                  <div class="col-md-7">
+                    <input class="form-control" type="text" id="resource-name" name="name" placeholder="请输入资源名称..">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <input class="form-control" type="hidden" id="phothUrl" name="phothUrl" placeholder="请输入网盘地址">
+                  <label class="col-md-3 control-label" for="example-dropzone">图片上传</label>
+                  <div class="col-md-7">
+                  <div id="example-dropzone" class="dropzone"></div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-md-3 control-label" for="url">网盘地址</label>
+                  <div class="col-md-7">
+                    <input class="form-control" type="text" id="url" name="url" placeholder="请输入网盘地址">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label" for="password">密码</label>
+                  <div class="col-md-7">
+                    <input class="form-control" type="text" id="password" name="password" placeholder="请输入网盘密码">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label" for="integral">积分</label>
+                  <div class="col-md-7">
+                    <input class="form-control" type="text" id="integral" name="integral" placeholder="请输入积分">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label" for="status-1">状态</label>
+                  <div class="col-md-3">
+                    <select class="form-control" id="status-1" name="status" size="1">
+                      <option value="1">审核中</option>
+                      <option value="2">通过</option>
+                      <option value="3">未通过</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label" for="description">描述</label>
+                  <div class="col-xs-7">
+                    <textarea class="form-control" id="description" name="description" rows="6" placeholder="内容.."></textarea>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default disclose" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-primary add-resource">提交</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script type="text/javascript" src="/js/bootstrap-table/bootstrap-table.js"></script>
+<script type="text/javascript" src="/js/bootstrap-table/bootstrap-table-zh-CN.min.js"></script>
+
+<!--行内编辑插件-->
+<link href="/js/x-editable/1.5.1/bootstrap3-editable/css/bootstrap-editable.min.css" rel="stylesheet">
+<script type="text/javascript" src="/js/x-editable/1.5.1/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap-table/extensions/editable/bootstrap-table-editable.min.js"></script>
+<script type="text/javascript" src="http://libs.itshubao.com/dropzone/min/dropzone.min.js"></script>
+<script th:src="@{/js/jquery.form.js}"></script>
+<script>
+    $(".add-resource").click(function(){
+        httpForm("#add-resource","post","/centrally/resource",$('#add-resource').serialize(),function (rt) {
+            $(".disclose").click();
+        })
+    });
+    $(function() {
+        // 默认使用情况
+        $("#example-dropzone").dropzone({
+            url: "/upload/yun",
+            dictDefaultMessage: '拖动文件至此或者点击上传',
+            method: "post",  // 也可用put
+            paramName: "file", // 默认为file
+            maxFiles: 1,// 一次性上传的文件数量上限
+            maxFilesize: 2, // 文件大小，单位：MB
+            acceptedFiles: ".jpg,.gif,.png,.jpeg", // 上传的类型
+            addRemoveLinks: true,
+            parallelUploads: 1,// 一次上传的文件数量
+            dictDefaultMessage: '拖动文件至此或者点击上传',
+            dictMaxFilesExceeded: "您最多只能上传1个文件！",
+            dictResponseError: '文件上传失败!',
+            dictInvalidFileType: "文件类型只能是*.jpg,*.gif,*.png,*.jpeg。",
+            dictFallbackMessage: "浏览器不受支持",
+            dictFileTooBig: "文件过大上传文件最大支持.",
+            dictRemoveLinks: "删除",
+            dictCancelUpload: "取消",
+            init: function () {
+                this.on("addedfile", function (file) {
+                    // 上传文件时触发的事件
+                });
+                this.on("success", function (file, data) {
+                   $("#phothUrl").val(data.data);
+                    console.log(data)
+                    // 上传成功触发的事件
+                });
+                this.on("error", function (file, data) {
+                    // 上传失败触发的事件
+                });
+                this.on("removedfile", function (file) {
+                    $("#phothUrl").val("");
+                    // 删除文件时触发的方法
+                });
+            }
+        });
+    });
+</script>
+<script type="text/javascript">
+
+    $(function () {
+        init();
+    })
+
+    function search() {
+        init();
+    }
+    function  init() {
+        $('#tb_departments').bootstrapTable({
+            classes: 'table table-bordered table-hover table-striped',
+            url: '/centrally/wx-resource-data',
+            method: 'get',
+            dataType : 'json',        // 因为本示例中是跨域的调用,所以涉及到ajax都采用jsonp,
+            uniqueId: 'id',
+            idField: 'id',             // 每行的唯一标识字段
+            toolbar: '#toolbar',       // 工具按钮容器
+            //clickToSelect: true,     // 是否启用点击选中行
+            showColumns: true,         // 是否显示所有的列
+            showRefresh: true,         // 是否显示刷新按钮
+            //showToggle: true,        // 是否显示详细视图和列表视图的切换按钮(clickToSelect同时设置为true时点击会报错)
+            pagination: true,                    // 是否显示分页
+            sortOrder: "asc",                    // 排序方式
+            queryParams: function(params) {
+                var temp = {
+                    pageSize: params.limit,         // 每页数据量
+                    offset: params.offset,       // sql语句起始索引
+                    page: (params.offset / params.limit) + 1,
+                    sort: params.sort,           // 排序的列名
+                    sortOrder: params.order ,     // 排序方式'asc' 'desc'
+                    name:$("#name").val(),
+                    nickName:$("#nickName").val(),
+                    status: $("#status").val()
+                };
+                return temp;
+            },                                   // 传递参数
+            sidePagination: "server",            // 分页方式：client客户端分页，server服务端分页
+            pageNumber: 1,                       // 初始化加载第一页，默认第一页
+            pageSize: 10,                        // 每页的记录行数
+            pageList: [10, 25, 50, 100],         // 可供选择的每页的行数
+          //  search: true,                      // 是否显示表格搜索，此搜索是客户端搜索
+
+           // showExport: true,        // 是否显示导出按钮, 导出功能需要导出插件支持(tableexport.min.js)
+           // exportDataType: "basic", // 导出数据类型, 'basic':当前页, 'all':所有数据, 'selected':选中的数据
+            columns: [{
+                checkbox: true    // 是否显示复选框
+            }, {
+                field: 'id',
+                title: 'ID',
+                sortable: true    // 是否排序
+            }, {
+                field: 'name',
+                title: '资源名称',
+                cellStyle:{
+                    css:{
+                        "overflow": "hidden",
+                        "text-overflow": "ellipsis",
+                        "white-space": "nowrap"
+                    }
+                }
+            }, {
+                field: 'nickName',
+                title: '昵称',
+            }, {
+                field: 'photoUrl',
+                title: '封面',
+                formatter: function(value, row, index) {
+                    return '<img src="'+value+'"style="width: 30px;height: 30px">';
+                }
+            }, {
+                field: 'records',
+                title: '下载数'
+            }, {
+                field: 'status',
+                title: '状态',
+                editable: {
+                    type: 'select',
+                    title: "状态",
+                    pk: 1,
+                    source: [
+                        { value: 1, text: '审核中'},
+                        { value: 2, text: '通过'},
+                        { value: 3, text: '未通过'}
+                    ],
+                    noeditFormatter: function (value, row, index) {
+                        var result;
+                        if (value == 1 || value == '审核中') {
+                            result = { filed: "status", value: "审核中", class: "label label-warning" };
+                        } else if (value == 2 || value == '通过') {
+                            result = { filed: "status", value: "通过", class: "label label-success" };
+                        }else if (value == 3 || value == '未通过') {
+                            result = { filed: "status", value: "正常", class: "label label-danger" };
+                        }
+                        return result; // 这里对bootstrap-table-editable.min.js做了一些修改，让其能接收class
+                    },
+                    highlight: false
+                }
+            }, {
+                field: 'integral',
+                title: '积分'
+            },{
+                field: 'url',
+                title: '网盘地址'
+            },{
+                field: 'password',
+                title: '网盘密码'
+            },{
+                field: 'typeName',
+                title: '分类'
+            },{
+                field: 'operate',
+                title: '操作',
+                formatter: btnGroup,  // 自定义方法
+                events: {
+                    'click .edit-btn': function (event, value, row, index) {
+                        editUser(row.id);
+                    },
+                    'click .del-btn': function (event, value, row, index) {
+                        delUser(row.id);
+                    }
+                }
+            }],
+            onEditableSave: function (field, row, oldValue, $el) {
+              var  data={"id":row.id, "status":row.status};
+                http("/centrally/wx-resource/updateStatus",'put',data,function (rt) {
+                    $('#tb_departments').bootstrapTable('updateCellById', {id: row.id, field: 'status',value:row.status});
+                },true)
+
+            },
+            onLoadSuccess: function(data){
+                $("[data-toggle='tooltip']").tooltip();
+                $('.bootstrap-table tr td').each(function () {
+                    $(this).attr("title", $(this).text());
+                    $(this).css("cursor", 'pointer');
+                });
+            }
+        });
+    }
+    // 操作按钮
+    function btnGroup () {
+        let html =  '<a href="#!" class="btn btn-xs btn-primary m-r-5 edit-btn" title="编辑" data-toggle="tooltip"><i class="mdi mdi-pencil"></i></a>' +
+            '<a href="#!" class="btn btn-xs btn-danger del-btn" title="删除" data-toggle="tooltip"><i class="mdi mdi-delete"></i></a>';
+        return html;
+    }
+
+    // 操作方法 - 编辑
+    function editUser(id) {
+
+    }
+    // 操作方法 - 删除
+    function delUser(id) {
+       // confirm("/menu/"+id,function ok(res) {
+       //     console.log(res)
+      //  })
+    }
+</script>
+
+</body>
+</html>

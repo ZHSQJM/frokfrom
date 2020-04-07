@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+<title>菜单列表</title>
+  <header th:replace="common/resource::html"></header>
+  <link href="https://cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.bootcss.com/jquery-treegrid/0.2.0/css/jquery.treegrid.min.css">
+  <link href="http://example.itshubao.com/demo/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="http://libs.itshubao.com/fontIconPicker/css/jquery.fonticonpicker.min.css" rel="stylesheet">
+  <link href="http://libs.itshubao.com/fontIconPicker/themes/bootstrap-theme/jquery.fonticonpicker.bootstrap.min.css" rel="stylesheet" />
+  <link href="http://lyear.itshubao.com/iframe/css/style.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="js/jconfirm/jquery-confirm.min.css">
+</head>
+
+<body>
+<div class="lyear-layout-web">
+  <div class="lyear-layout-container">
+    <!--左侧导航-->
+    <aside th:replace="common/menu::menu"></aside>
+    <!--End 左侧导航-->
+    
+    <!--头部信息-->
+    <aside th:replace="common/header::header"></aside>
+    <!--End 头部信息-->
+    
+    <!--页面主要内容-->
+    <main class="lyear-layout-content">
+      
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="card">
+              <div class="card-toolbar clearfix">
+                <div class="toolbar-btn-action">
+                  <a class="btn btn-primary m-r-5" href="#modal-form-update" data-toggle="modal"><i class="mdi mdi-plus"></i> 新增</a>
+                  <a class="btn btn-danger" href="javascript"><i class="mdi mdi-window-close"></i> 删除</a>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table id="table"></table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="modal-form-update" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="exampleModalLabel">新增</h4>
+            </div>
+            <div class="modal-body">
+              <form class="form-horizontal" id="add-menu" action="lyear_forms_elements.html" method="post" onsubmit="return false;">
+                <div class="form-group">
+                  <label class="col-md-3 control-label" for="pid">上级菜单</label>
+                  <div class="col-md-7">
+                    <select class="form-control" id="pid" name="pid" size="1">
+                      <option value="0">菜单</option>
+                      <option value="1">按钮</option>
+                      <option value="2">接口</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label" for="resource-name">菜单名称</label>
+                  <div class="col-md-7">
+                    <input class="form-control" type="text" id="resource-name" name="name" placeholder="请输入资源名称..">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label" for="url">地址</label>
+                  <div class="col-md-7">
+                    <input class="form-control" type="text" id="url" name="url" placeholder="地址">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label" for="code">权限吗</label>
+                  <div class="col-md-7">
+                    <input class="form-control" type="text" id="code" name="code" placeholder="权限码">
+                    <input type="hidden" name="icon" id="icon">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label" for="icon">图标</label>
+                  <div class="col-md-7">
+
+                    <input type="text" id="icon-example" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label" for="type">类型</label>
+                  <div class="col-md-7">
+                    <select class="form-control" id="type" name="type" size="1">
+                      <option value="0">菜单</option>
+                      <option value="1">按钮</option>
+                      <option value="2">接口</option>
+
+                    </select>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-primary add-menu">提交</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+    <!--End 页面主要内容-->
+  </div>
+</div>
+
+  <script src="https://cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.min.js"></script>
+  <script src="https://cdn.bootcss.com/bootstrap-table/1.12.0/extensions/treegrid/bootstrap-table-treegrid.js"></script>
+  <script src="https://cdn.bootcss.com/jquery-treegrid/0.2.0/js/jquery.treegrid.min.js"></script>
+ <script type="text/javascript" src="http://libs.itshubao.com/fontIconPicker/jquery.fonticonpicker.min.js"></script>
+  <script>
+      jQuery(document).ready(function($) {
+          var font_element = $('#icon-example').fontIconPicker({
+              theme: 'fip-bootstrap'
+          });
+          $.ajax({
+              url: '../../../materialdesignicons.json',
+              type: 'GET',
+          }).done(function(response) {
+              var fontello_json_icons = [];
+              $.each(response.glyphs, function(i, v) {
+                  fontello_json_icons.push( v.css );
+              });
+              font_element.setIcons(fontello_json_icons);
+          }).fail(function() {
+              console.error('字体图标配置加载失败');
+          });
+
+      });
+  </script>
+  <script type="text/javascript" th:inline="javascript">
+      var $table = $('#table');
+      var data = [[${data}]];
+      $(function() {
+          $table.bootstrapTable({
+              data:data,
+              idField: 'id',
+              dataType:'jsonp',
+              columns: [
+                  { field: 'check',  checkbox: true, formatter: function (value, row, index) {
+                          if (row.check == true) {
+                              // console.log(row.serverName);
+                              //设置选中
+                              return {  checked: true };
+                          }
+                      }
+                  },
+                  { field: 'name',  title: '名称' },
+                  { field: 'type',  title: '类型',   align: 'center', formatter: 'typeFormatter'  },
+                  { field: 'permissionValue', title: '权限值'  },
+                  { field: 'href', title: '地址'  },
+                  { field: 'icon', title: '图标'  ,  align: 'center', formatter: 'iconFormatter' },
+                  { field: 'createTime', title: '创建时间'  ,  align: 'center' },
+                  { field: 'updateTime', title: '更新时间'  ,  align: 'center'},
+                  { field: 'operate', title: '操作', align: 'center', events : operateEvents, formatter: 'operateFormatter' },
+              ],
+              // bootstrap-table-treegrid.js 插件配置 -- start
+              //在哪一列展开树形
+              treeShowField: 'name',
+              //指定父id列
+              parentIdField: 'pid',
+              onResetView: function(data) {
+                  //console.log('load');
+                  $table.treegrid({
+                      initialState: 'collapsed',// 所有节点都折叠
+                      // initialState: 'expanded',// 所有节点都展开，默认展开
+                      treeColumn: 1,
+                      // expanderExpandedClass: 'glyphicon glyphicon-minus',  //图标样式
+                      // expanderCollapsedClass: 'glyphicon glyphicon-plus',
+                      onChange: function() {
+                          $table.bootstrapTable('resetWidth');
+                      }
+                  });
+
+                  //只展开树形的第一级节点
+               $table.treegrid('getRootNodes').treegrid('expand');
+
+              },
+              onCheck:function(row){
+                  var datas = $table.bootstrapTable('getData');
+                  // 勾选子类
+                  selectChilds(datas,row,"id","pid",true);
+
+                  // 勾选父类
+                  selectParentChecked(datas,row,"id","pid")
+
+                  // 刷新数据
+                  $table.bootstrapTable('load', datas);
+              },
+
+              onUncheck:function(row){
+                  var datas = $table.bootstrapTable('getData');
+                  selectChilds(datas,row,"id","pid",false);
+                  $table.bootstrapTable('load', datas);
+              },
+              // bootstrap-table-treetreegrid.js 插件配置 -- end
+          });
+      });
+
+      // 格式化按钮
+      function operateFormatter(value, row, index) {
+          return [
+              '  <a class="btn btn-xs btn-default MenuOfadd" href="#!" title="新增" data-toggle="tooltip"><i class="mdi mdi-plus"></i></a>',
+            '  <a class="btn btn-xs btn-default menuOfedit" href="#!" title="修改" data-toggle="tooltip"><i class="mdi mdi-pencil"></i></a>',
+          '<a class="btn btn-xs btn-default MenuOfdelete " href="#!" title="删除" data-toggle="tooltip"><i class="mdi mdi-window-close"></i></a>'
+          ].join('');
+
+      }
+      // 格式化类型
+      function typeFormatter(value, row, index) {
+          if (value === 0) { return '<button type="button" class="btn btn-cyan btn-sm " style="margin-right:15px;">菜单</button>' }
+          if (value === 1) { return '<button type="button" class="btn btn-yellow btn-sm " style="margin-right:15px;">按钮</button>' }
+          if (value === 2) { return '<button type="button" class="btn btn-pink btn-sm " style="margin-right:15px;">接口</button>'}
+          return '-';
+      }
+      function iconFormatter(value, row, index) {
+          return '<i class="'+value+'"><i>'
+      }
+      function dateFormatter(value, row, index) {
+          return '<i class="'+value+'"><i>'
+      }
+      //初始化操作按钮的方法
+      window.operateEvents = {
+          'click .MenuOfadd': function (e, value, row, index) {
+              add(row.id);
+          },
+          'click .MenuOfdelete': function (e, value, row, index) {
+              del(row.id);
+          },
+          'click .menuOfedit': function (e, value, row, index) {
+              update(row.id);
+          }
+      };
+  </script>
+  <script>
+      /**
+       * 选中父项时，同时选中子项
+       * @param datas 所有的数据
+       * @param row 当前数据
+       * @param id id 字段名
+       * @param pid 父id字段名
+       */
+      function selectChilds(datas,row,id,pid,checked) {
+          for(var i in datas){
+              if(datas[i][pid] == row[id]){
+                  datas[i].check=checked;
+                  selectChilds(datas,datas[i],id,pid,checked);
+              };
+          }
+      }
+
+      function selectParentChecked(datas,row,id,pid){
+          for(var i in datas){
+              if(datas[i][id] == row[pid]){
+                  datas[i].check=true;
+                  selectParentChecked(datas,datas[i],id,pid);
+              };
+          }
+      }
+
+      function test() {
+          var selRows = $table.bootstrapTable("getSelections");
+          if(selRows.length == 0){
+              alert("请至少选择一行");
+              return;
+          }
+          var postData = "";
+          $.each(selRows,function(i) {
+              postData +=  this.id;
+              if (i < selRows.length - 1) {
+                  postData += "， ";
+              }
+          });
+          alert("你选中行的 id 为："+postData);
+      }
+      function add(id) {
+          alert("add 方法 , id = " + id);
+      }
+      function del(id) {
+          confirm("/menu/"+id,function ok(res) {
+              console.log(res)
+          })
+      }
+      function update(id) {
+          alert("update 方法 , id = " + id);
+      }
+
+
+  </script>
+  <script th:src="@{/js/jquery.form.js}"></script>
+  <script src="js/jconfirm/jquery-confirm.min.js"></script>
+ <script>
+     $(".add-menu").click(function(){
+         lightyear.loading('show');
+         $("#icon").val($("#icon-example").val());
+         httpForm("#add-menu","post","menu",$('#add-menu').serialize(),function (rt) {
+                 console.log(rt)
+         })
+     });
+ </script>
+</body>
+</html>

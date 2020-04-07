@@ -1,0 +1,76 @@
+spring:
+  datasource:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/formwork?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=UTC
+      username: root
+      password: zhs
+      platform: mysql
+      type: com.alibaba.druid.pool.DruidDataSource
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    cache: false
+  security:
+    loginType: HTML
+  servlet:
+     multipart:
+       enabled: true
+       location: F:/file
+       file-size-threshold: 5MB
+       max-file-size: 20MB
+
+
+
+mybatis:
+  type-aliases-package: com.zhs.model
+  mapper-locations: classpath:/mybatis-mappers/*
+  configuration:
+    mapUnderscoreToCamelCase: true
+   # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+server:
+  port: 8081
+
+qiniu:
+ ## 此处填写你自己的七牛云 access key
+ accessKey: Sp760x_xY5jLb8HeTnUrUxXQVX52VweKie1QNjis
+ ## 此处填写你自己的七牛云 secret key
+ secretKey: lFgRMpXJkXEFg1yUuqouZ0XN0cR228RLdA8O9W1H
+ ## 此处填写你自己的七牛云 bucket
+ bucket: resource-zhs
+ ## 此处填写你自己的七牛云 域名
+ prefix: www.zhouhuasheng.top
+
+
+#tgip-mq-msg:
+#  #application @EnableScheduling
+#  # 十五秒一次
+#  enable: true
+#  task:
+#    cron: "*/15 * * * * ?"
+#    enable: true
+#  no-consumer: true
+#  exchange:
+#    name: demo-tgip-server
+#  queue:
+#    add:
+#      name: demo-poi-info-add
+#    update:
+#      name: demo-poi-info-update
+#    delete:
+#      name: demo-poi-info-delete
+#    query:
+#      name: demo-poi-info-query
+#    common:
+#      name: demo-common
+#  db:
+#    driver-class-name: org.postgresql.Driver
+#    url: jdbc:postgresql://192.168.8.155:5432/postgres
+#    username: postgres
+#    password: handsmap123
+#logging:
+#  level:
+#    com.handsmap.map.mqcommon.mapper: debug

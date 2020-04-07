@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhs.mapper.WxSearchRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.zhs.entity.WxSearchRecord" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <result column="id" property="id" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="keyword" property="keyword" jdbcType="VARCHAR" />
+    <result column="open_id" property="openId" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <resultMap id="BaseResultMapVo" type="com.zhs.vo.SearchRecordVo" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <result column="id" property="id" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="keyword" property="keyword" jdbcType="VARCHAR" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <select id="list" resultMap="BaseResultMapVo">
+SELECT a.id,a.create_time,a.keyword,c.nick_name FROM wx_search_record as a
+
+inner join wx_user as c  on a.open_id = c.open_id       order by  a.create_time desc
+
+
+  </select>
+</mapper>

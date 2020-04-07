@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhs.mapper.WxExchangeRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.zhs.entity.WxExchangeRecord" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <result column="id" property="id" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="integral" property="integral" jdbcType="INTEGER" />
+    <result column="resource_id" property="resourceId" jdbcType="BIGINT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <resultMap id="BaseResultMapVo" type="com.zhs.vo.ExchangeRecordVo" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <result column="id" property="id" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="integral" property="integral" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <select id="list" resultMap="BaseResultMapVo">
+
+    SELECT a.id,a.integral,a.create_time,a.`status`,b.`name`,c.nick_name FROM wx_exchange_records as a inner join wx_resource as b on a.resource_id = b.id
+
+inner join wx_user as c  on a.user_id = c.open_id  order by  a.create_time desc
+
+  </select>
+</mapper>

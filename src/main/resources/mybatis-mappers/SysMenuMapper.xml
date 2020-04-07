@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhs.mapper.SysMenuMapper">
+  <resultMap id="BaseResultMap" type="com.zhs.entity.SysMenu">
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="icon" jdbcType="VARCHAR" property="icon" />
+    <result column="mid" jdbcType="INTEGER" property="mid" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+
+  <select id="findMenuByUserName" resultMap="BaseResultMap">
+    	select m.* from sys_role r
+        left join sys_user_role ur on(r.id = ur.role_id)
+        left join sys_user u on(u.id = ur.user_id)
+        left join sys_role_menu rm on(rm.role_id = r.id)
+        left join sys_menu m on(m.id = rm.menu_id )
+        where u.username = #{usernam} and m.code is not null
+  </select>
+</mapper>
